@@ -1,112 +1,96 @@
-#include <iostream> 
-using namespace std; 
-#define UNASSIGNED 0  
+#define N 4 
+#include <stdbool.h> 
+#include <stdio.h> 
+
+
+void printSolution(int board[N][N]) 
+{ 
+    for (int i = 0; i < N; i++) { 
+        for (int j = 0; j < N; j++) 
+            printf(" %d ", board[i][j]); 
+        printf("\n"); 
+    } 
+} 
   
-#define N 4  
-bool FindUnassignedLocation(int grid[N][N],  
-                            int &row, int &col);  
+
+
+bool isSafe(int board[N][N], int row, int col) 
+{ 
+    int i, j; 
   
  
-bool isSafe(int grid[N][N], int row, 
-                   int col, int num);  
-bool SolveSudoku(int grid[N][N])  
-{  
-    int row, col;  
+    for (i = 0; i < col; i++) 
+        if (board[row][i]) 
+            return false; 
   
-     
-    if (!FindUnassignedLocation(grid, row, col))  
-    return true; // success!  
-    for (int num = 1; num <= 4; num++)  
-    {  
-        if (isSafe(grid, row, col, num))  
-        {  
-            grid[row][col] = num;  
+   
+    for (i = row, j = col; i >= 0 && j >= 0; i--, j--) 
+        if (board[i][j]) 
+            return false; 
   
-            
-            if (SolveSudoku(grid))  
-                return true;  
-            grid[row][col] = UNASSIGNED;  
-        }  
-    }  
-    return false; 
-}  
+   
+    for (i = row, j = col; j >= 0 && i < N; i++, j--) 
+        if (board[i][j]) 
+            return false; 
+  
+    return true; 
+} 
   
 
-bool FindUnassignedLocation(int grid[N][N],  
-                            int &row, int &col)  
-{  
-    for (row = 0; row < N; row++)  
-        for (col = 0; col < N; col++)  
-            if (grid[row][col] == UNASSIGNED)  
-                return true;  
-    return false;  
-}  
-  
-
-bool UsedInRow(int grid[N][N], int row, int num)  
-{  
-    for (int col = 0; col < N; col++)  
-        if (grid[row][col] == num)  
-            return true;  
-    return false;  
-}  
-  
-
-bool UsedInCol(int grid[N][N], int col, int num)  
-{  
-    for (int row = 0; row < N; row++)  
-        if (grid[row][col] == num)  
-            return true;  
-    return false;  
-}  
-  
-
-bool UsedInBox(int grid[N][N], int boxStartRow, 
-               int boxStartCol, int num)  
-{  
-    for (int row = 0; row < 2; row++)  
-        for (int col = 0; col < 2; col++)  
-            if (grid[row + boxStartRow] 
-                    [col + boxStartCol] == num)  
-                return true;  
-    return false;  
-}  
-  
-
-bool isSafe(int grid[N][N], int row,  
-                   int col, int num)  
-{  
+bool solveNQUtil(int board[N][N], int col) 
+{ 
     
-    return !UsedInRow(grid, row, num) &&  
-           !UsedInCol(grid, col, num) &&  
-           !UsedInBox(grid, row - row % 2 ,  
-                      col - col % 2, num) &&  
-            grid[row][col] == UNASSIGNED;  
-}  
+    if (col >= N) 
+        return true; 
+  
+   
+    for (int i = 0; i < N; i++) { 
+      
+        if (isSafe(board, i, col)) { 
+           
+            board[i][col] = 1; 
+  
+       
+            if (solveNQUtil(board, col + 1)) 
+                return true; 
+  
+           
+            board[i][col] = 0; // BACKTRACK 
+        } 
+    } 
+  
+   
+    return false; 
+} 
   
 
-void printGrid(int grid[N][N])  
-{  
-    for (int row = 0; row < N; row++)  
-    {  
-    for (int col = 0; col < N; col++)  
-            cout << grid[row][col] << " ";  
-        cout << endl; 
-    }  
-}  
+bool solveNQ() 
+{ 
+   /*int board[N][N] = { { 0, 0, 0, 0 }, 
+                        { 0, 0, 0, 0 }, 
+                        { 0, 0, 0, 0 }, 
+                        { 0, 0, 0, 0 } }; */
+	int board[N][N],i,j,n;
+	printf("enter the number of queens");
+	scanf("%d",&n);
+	printf("enter the adjacency matrix");
+	for(i=0;i<n;i++)
+		for(j=0;j<n;j++)
+			scanf("%d",&board[i][j]);
+			
   
-int main()  
-{  
-    int grid[N][N] = {{2, 0, 0, 0},  
-                      {0, 1, 3, 0},  
-                      {3, 0, 0, 1},  
-                      {0, 2, 4, 0}};  
-                       
-    if (SolveSudoku(grid) == true)  
-        printGrid(grid);  
-    else
-        cout << "No solution exists";  
+    if (solveNQUtil(board, 0) == false) { 
+        printf("Solution does not exist"); 
+        return false; 
+    } 
   
-    return 0;  
-}  
+    printSolution(board); 
+    return true; 
+} 
   
+
+int main() 
+{ 
+    solveNQ(); 
+    return 0; 
+} 
