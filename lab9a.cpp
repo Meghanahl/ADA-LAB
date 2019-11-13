@@ -36,3 +36,5 @@ int main()
          << minCoins(coins, m, V); 
     return 0; 
 } 
+//output:
+//Minimum coins required is 2
